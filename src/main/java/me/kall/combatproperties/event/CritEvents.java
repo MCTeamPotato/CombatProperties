@@ -1,12 +1,12 @@
 package me.kall.combatproperties.event;
 
 import me.kall.combatproperties.CombatProperties;
-import me.kall.combatproperties.attribute.BaseAttribute;
+import me.kall.combatproperties.api.Attributes;
 import me.kall.combatproperties.api.event.InteractiveEvent;
+import me.kall.combatproperties.attribute.BaseAttribute;
 import me.kall.combatproperties.config.CombatConfig;
 import me.kall.combatproperties.network.ParticlePacket;
 import me.kall.combatproperties.network.ParticlesConstant;
-import me.kall.combatproperties.registry.ModAttributes;
 import me.kall.combatproperties.registry.ModPackets;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -14,7 +14,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -47,11 +46,11 @@ public class CritEvents {
         if (event.getSource().getEntity() instanceof LivingEntity source && source.level() instanceof ServerLevel level) {
             LivingEntity attacked = event.getEntity();
 
-            AttributeInstance crit = source.getAttribute(ModAttributes.CRIT.get());
-            AttributeInstance critRes = attacked.getAttribute(ModAttributes.CRIT_RESISTANCE.get());
-            if (crit == null || critRes == null) return;
+            double crit = Attributes.getCrit(source);
+            double critRes = Attributes.getCritRes(attacked);
+            if (crit == Attributes.NOT_PRESENT) return;
 
-            double critChance = BaseAttribute.calChance(crit.getValue(), critRes.getValue());
+            double critChance = BaseAttribute.calChance(crit, critRes == Attributes.NOT_PRESENT ? 0.00 : critRes);
             if (ThreadLocalRandom.current().nextDouble(0.00, 1.00) > critChance) return;
             InteractiveEvent.Crit critEvent = new InteractiveEvent.Crit(source);
             boolean cancelled = MinecraftForge.EVENT_BUS.post(critEvent);

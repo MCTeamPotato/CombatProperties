@@ -1,16 +1,15 @@
 package me.kall.combatproperties.event;
 
 import me.kall.combatproperties.CombatProperties;
-import me.kall.combatproperties.attribute.BaseAttribute;
+import me.kall.combatproperties.api.Attributes;
 import me.kall.combatproperties.api.event.InteractiveEvent;
+import me.kall.combatproperties.attribute.BaseAttribute;
 import me.kall.combatproperties.network.ParticlePacket;
 import me.kall.combatproperties.network.ParticlesConstant;
-import me.kall.combatproperties.registry.ModAttributes;
 import me.kall.combatproperties.registry.ModPackets;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -27,11 +26,11 @@ public class EvasionEvents {
         if (event.getSource().getEntity() instanceof LivingEntity source && source.level() instanceof ServerLevel level) {
             LivingEntity attacked = event.getEntity();
 
-            AttributeInstance evasion = attacked.getAttribute(ModAttributes.EVASION.get());
-            AttributeInstance accuracy = source.getAttribute(ModAttributes.ACCURACY.get());
-            if (evasion == null || accuracy == null) return;
+            double evasion = Attributes.getEvasion(attacked);
+            double accuracy = Attributes.getAccuracy(source);
+            if (evasion == Attributes.NOT_PRESENT) return;
 
-            double evasionChance = BaseAttribute.calChance(evasion.getValue(), accuracy.getValue());
+            double evasionChance = BaseAttribute.calChance(evasion, accuracy == Attributes.NOT_PRESENT ? 0.00 : accuracy);
             if (ThreadLocalRandom.current().nextDouble(0.00, 1.00) > evasionChance) return;
 
             InteractiveEvent.Evasion evasionEvent = new InteractiveEvent.Evasion(attacked);

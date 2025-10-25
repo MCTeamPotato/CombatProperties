@@ -1,12 +1,12 @@
 package me.kall.combatproperties.event;
 
 import me.kall.combatproperties.CombatProperties;
+import me.kall.combatproperties.api.Attributes;
 import me.kall.combatproperties.api.event.InteractiveEvent;
 import me.kall.combatproperties.attribute.BaseAttribute;
 import me.kall.combatproperties.config.CombatConfig;
 import me.kall.combatproperties.network.ParticlePacket;
 import me.kall.combatproperties.network.ParticlesConstant;
-import me.kall.combatproperties.registry.ModAttributes;
 import me.kall.combatproperties.registry.ModPackets;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -14,7 +14,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
@@ -46,12 +45,12 @@ public class BlockEvents {
         if (event.getSource().getEntity() instanceof LivingEntity source && source.level() instanceof ServerLevel level) {
             LivingEntity attacked = event.getEntity();
 
-            AttributeInstance block = attacked.getAttribute(ModAttributes.BLOCK.get());
-            AttributeInstance penetration = source.getAttribute(ModAttributes.PENETRATION.get());
+            double block = Attributes.getBlock(attacked);
+            double penetration = Attributes.getPenetration(source);
 
-            if (block == null || penetration == null) return;
+            if (block == Attributes.NOT_PRESENT) return;
 
-            double blockChance = BaseAttribute.calChance(block.getValue(), penetration.getValue());
+            double blockChance = BaseAttribute.calChance(block, penetration == Attributes.NOT_PRESENT ? 0.00 : penetration);
             if (ThreadLocalRandom.current().nextDouble(0.00, 1.00) > blockChance) return;
 
             InteractiveEvent.Block blockEvent = new InteractiveEvent.Block(attacked);

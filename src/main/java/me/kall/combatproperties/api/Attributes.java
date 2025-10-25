@@ -9,31 +9,33 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 public final class Attributes {
-    public static @NotNull Optional<AttributeInstance> get(@NotNull LivingEntity entity, Attribute attribute) {
-        return Optional.ofNullable(entity.getAttribute(attribute));
+    public static final double NOT_PRESENT = -1.00;
+
+    public static double get(@NotNull LivingEntity entity, Attribute attribute) {
+        return Optional.ofNullable(entity.getAttribute(attribute)).map(AttributeInstance::getValue).orElse(NOT_PRESENT);
     }
 
-    public static @NotNull Optional<AttributeInstance> getBlock(LivingEntity entity) {
+    public static double getBlock(LivingEntity entity) {
         return get(entity, ModAttributes.BLOCK.get());
     }
 
-    public static @NotNull Optional<AttributeInstance> getPenetration(LivingEntity entity) {
+    public static double getPenetration(LivingEntity entity) {
         return get(entity, ModAttributes.PENETRATION.get());
     }
 
-    public static @NotNull Optional<AttributeInstance> getCrit(LivingEntity entity) {
+    public static double getCrit(LivingEntity entity) {
         return get(entity, ModAttributes.CRIT.get());
     }
 
-    public static @NotNull Optional<AttributeInstance> getCritRes(LivingEntity entity) {
+    public static double getCritRes(LivingEntity entity) {
         return get(entity, ModAttributes.CRIT_RESISTANCE.get());
     }
 
-    public static @NotNull Optional<AttributeInstance> getAccuracy(LivingEntity entity) {
+    public static double getAccuracy(LivingEntity entity) {
         return get(entity, ModAttributes.ACCURACY.get());
     }
 
-    public static @NotNull Optional<AttributeInstance> getEvasion(LivingEntity entity) {
+    public static double getEvasion(LivingEntity entity) {
         return get(entity, ModAttributes.EVASION.get());
     }
 }
