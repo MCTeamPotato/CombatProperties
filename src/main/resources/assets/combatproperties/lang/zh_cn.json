@@ -1,0 +1,8 @@
+{
+  "attribute.combatproperties.block": "格挡率",
+  "attribute.combatproperties.penetration": "破击率",
+  "attribute.combatproperties.crit": "暴击率",
+  "attribute.combatproperties.crit_resistance": "防暴率",
+  "attribute.combatproperties.accuracy": "命中率",
+  "attribute.combatproperties.evasion": "闪避率"
+}

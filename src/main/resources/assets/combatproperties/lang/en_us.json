@@ -1,0 +1,8 @@
+{
+  "attribute.combatproperties.block": "Block Rate",
+  "attribute.combatproperties.penetration": "Penetration Rate",
+  "attribute.combatproperties.crit": "Crit Rate",
+  "attribute.combatproperties.crit_resistance": "Crit Resistance Rate",
+  "attribute.combatproperties.accuracy": "Accuracy Rate",
+  "attribute.combatproperties.evasion": "Evasion Rate"
+}
