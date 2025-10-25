@@ -1,8 +1,10 @@
 package me.kall.combatproperties;
 
+import me.kall.combatproperties.config.CombatConfig;
 import me.kall.combatproperties.registry.ModAttributes;
 import me.kall.combatproperties.registry.ModPackets;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,5 +19,6 @@ public final class CombatProperties {
     public CombatProperties(@NotNull FMLJavaModLoadingContext context) {
         ModAttributes.REGISTER.register(context.getModEventBus());
         ModPackets.register();
+        context.registerConfig(ModConfig.Type.COMMON, CombatConfig.INSTANCE);
     }
 }

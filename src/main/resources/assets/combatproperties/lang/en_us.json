@@ -4,5 +4,8 @@
   "attribute.combatproperties.crit": "Crit Rate",
   "attribute.combatproperties.crit_resistance": "Crit Resistance Rate",
   "attribute.combatproperties.accuracy": "Accuracy Rate",
-  "attribute.combatproperties.evasion": "Evasion Rate"
+  "attribute.combatproperties.evasion": "Evasion Rate",
+
+  "chat.combatproperties.crit": "Note: Vanilla Critical Hit is disabled as we have Crit Rate Attribute available with Combat Properties mod.",
+  "chat.combatproperties.block": "Note: Vanilla Shield Block is disabled as we have Block Rate Attribute available with Combat Properties mod."
 }

@@ -1,13 +1,17 @@
 package me.kall.combatproperties.event;
 
 import me.kall.combatproperties.CombatProperties;
-import me.kall.combatproperties.attribute.BaseAttribute;
 import me.kall.combatproperties.api.event.InteractiveEvent;
+import me.kall.combatproperties.attribute.BaseAttribute;
+import me.kall.combatproperties.config.CombatConfig;
 import me.kall.combatproperties.network.ParticlePacket;
 import me.kall.combatproperties.network.ParticlesConstant;
 import me.kall.combatproperties.registry.ModAttributes;
 import me.kall.combatproperties.registry.ModPackets;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -18,6 +22,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -25,11 +30,19 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onShieldBlock(ShieldBlockEvent event) {
-        event.setCanceled(true);
+        if (CombatConfig.DISABLE_SHIELD_BLOCK.get()) event.setCanceled(true);
+
+        LivingEntity entity = event.getEntity();
+        CompoundTag data = entity.getPersistentData();
+
+        if (CombatConfig.NOTIFICATION_CRIT.get() && !data.getBoolean("BlockNotification") && entity instanceof ServerPlayer player) {
+            player.displayClientMessage(Component.translatable("chat.combatproperties.block"), false);
+            data.putBoolean("BlockNotification", true);
+        }
     }
 
     @SubscribeEvent
-    public static void onDamage(LivingDamageEvent event) {
+    public static void onDamage(@NotNull LivingDamageEvent event) {
         if (event.getSource().getEntity() instanceof LivingEntity source && source.level() instanceof ServerLevel level) {
             LivingEntity attacked = event.getEntity();
 

@@ -4,5 +4,8 @@
   "attribute.combatproperties.crit": "暴击率",
   "attribute.combatproperties.crit_resistance": "防暴率",
   "attribute.combatproperties.accuracy": "命中率",
-  "attribute.combatproperties.evasion": "闪避率"
+  "attribute.combatproperties.evasion": "闪避率",
+
+  "chat.combatproperties.crit": "注意：原版暴击已被禁用，因为 Combat Properties 模组提供了暴击率属性。",
+  "chat.combatproperties.block": "注意：原版盾牌格挡已被禁用，因为 Combat Properties 模组提供了格挡率属性。"
 }
