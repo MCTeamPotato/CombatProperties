@@ -12,6 +12,3 @@ description = '''
 A Minecraft mod
 '''
 #logoFile = ""
-
-[[mixins]]
-config = "combatproperties.mixins.json"

@@ -7,7 +7,6 @@ import me.kall.combatproperties.attribute.BaseAttribute;
 import me.kall.combatproperties.config.CombatConfig;
 import me.kall.combatproperties.network.ParticlePacket;
 import me.kall.combatproperties.network.ParticlesConstant;
-import me.kall.combatproperties.registry.ModPackets;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -15,22 +14,21 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.player.CriticalHitEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = CombatProperties.MOD_ID)
+@EventBusSubscriber(modid = CombatProperties.MOD_ID)
 public class CritEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onCrit(CriticalHitEvent event) {
-        if (CombatConfig.DISABLE_CRIT_HIT.get()) event.setResult(Event.Result.DENY);
+        if (CombatConfig.DISABLE_CRIT_HIT.get()) event.setCriticalHit(false);
 
         Player player = event.getEntity();
         CompoundTag data = player.getPersistentData();
@@ -42,7 +40,7 @@ public class CritEvents {
     }
 
     @SubscribeEvent
-    public static void onDamage(LivingDamageEvent event) {
+    public static void onDamage(LivingDamageEvent.Pre event) {
         if (event.getSource().getEntity() instanceof LivingEntity source && source.level() instanceof ServerLevel level) {
             LivingEntity attacked = event.getEntity();
 
@@ -53,14 +51,14 @@ public class CritEvents {
             double critChance = BaseAttribute.calChance(crit, critRes == Attributes.NOT_PRESENT ? 0.00 : critRes);
             if (ThreadLocalRandom.current().nextDouble(0.00, 1.00) > critChance) return;
             InteractiveEvent.Crit critEvent = new InteractiveEvent.Crit(source);
-            boolean cancelled = MinecraftForge.EVENT_BUS.post(critEvent);
+            boolean cancelled = NeoForge.EVENT_BUS.post(critEvent).isCanceled();
 
             if (cancelled) return;
 
-            event.setAmount(event.getAmount() * critEvent.getDmgMultiply());
+            event.setNewDamage(event.getNewDamage() * critEvent.getDmgMultiply());
 
             if (critEvent.isSoundAllowed()) level.playSound(null, source.getX(), source.getY(), source.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, source.getSoundSource(), 1.0F, 1.0F);
-            if (critEvent.isParticleAllowed()) ModPackets.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> attacked), new ParticlePacket(attacked.getId(), ParticlesConstant.CRIT));
+            if (critEvent.isParticleAllowed()) PacketDistributor.sendToPlayersTrackingEntity(attacked, new ParticlePacket(attacked.getId(), ParticlesConstant.CRIT));
         }
     }
 }

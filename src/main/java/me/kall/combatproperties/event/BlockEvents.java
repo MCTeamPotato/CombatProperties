@@ -7,28 +7,27 @@ import me.kall.combatproperties.attribute.BaseAttribute;
 import me.kall.combatproperties.config.CombatConfig;
 import me.kall.combatproperties.network.ParticlePacket;
 import me.kall.combatproperties.network.ParticlesConstant;
-import me.kall.combatproperties.registry.ModPackets;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.ShieldBlockEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-@Mod.EventBusSubscriber(modid = CombatProperties.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = CombatProperties.MOD_ID)
 public class BlockEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onShieldBlock(ShieldBlockEvent event) {
+    public static void onShieldBlock(LivingShieldBlockEvent event) {
         if (CombatConfig.DISABLE_SHIELD_BLOCK.get()) event.setCanceled(true);
 
         LivingEntity entity = event.getEntity();
@@ -41,7 +40,7 @@ public class BlockEvents {
     }
 
     @SubscribeEvent
-    public static void onDamage(@NotNull LivingDamageEvent event) {
+    public static void onDamage(@NotNull LivingDamageEvent.Pre event) {
         if (event.getSource().getEntity() instanceof LivingEntity source && source.level() instanceof ServerLevel level) {
             LivingEntity attacked = event.getEntity();
 
@@ -54,13 +53,13 @@ public class BlockEvents {
             if (ThreadLocalRandom.current().nextDouble(0.00, 1.00) > blockChance) return;
 
             InteractiveEvent.Block blockEvent = new InteractiveEvent.Block(attacked);
-            boolean cancelled = MinecraftForge.EVENT_BUS.post(blockEvent);
+            boolean cancelled = NeoForge.EVENT_BUS.post(blockEvent).isCanceled();
             if (cancelled) return;
 
-            event.setAmount(event.getAmount() * blockEvent.getDmgMultiply());
+            event.setNewDamage(event.getNewDamage() * blockEvent.getDmgMultiply());
 
             if (blockEvent.isSoundAllowed()) level.playSound(null, attacked.getX(), attacked.getY(), attacked.getZ(), SoundEvents.ANVIL_LAND, attacked.getSoundSource(), 1.0F, 1.0F);
-            if (blockEvent.isParticleAllowed()) ModPackets.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> attacked), new ParticlePacket(attacked.getId(), ParticlesConstant.BLOCK));
+            if (blockEvent.isParticleAllowed()) PacketDistributor.sendToPlayersTrackingEntity(attacked, new ParticlePacket(attacked.getId(), ParticlesConstant.BLOCK));
         }
     }
 }

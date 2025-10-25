@@ -1,8 +1,8 @@
 package me.kall.combatproperties.api.event;
 
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
 
 public abstract class InteractiveEvent extends LivingEvent {
     private boolean particle = true;
@@ -28,8 +28,7 @@ public abstract class InteractiveEvent extends LivingEvent {
         this.sound = soundAllowed;
     }
 
-    @Cancelable
-    public static class Block extends InteractiveEvent {
+    public static class Block extends InteractiveEvent implements ICancellableEvent {
         private float dmgMultiply = 0.5F;
 
         public Block(LivingEntity entity) {
@@ -45,8 +44,7 @@ public abstract class InteractiveEvent extends LivingEvent {
         }
     }
 
-    @Cancelable
-    public static class Crit extends InteractiveEvent {
+    public static class Crit extends InteractiveEvent implements ICancellableEvent {
         private float dmgMultiply = 2.0F;
 
         public Crit(LivingEntity entity) {
@@ -62,8 +60,7 @@ public abstract class InteractiveEvent extends LivingEvent {
         }
     }
 
-    @Cancelable
-    public static class Evasion extends InteractiveEvent {
+    public static class Evasion extends InteractiveEvent implements ICancellableEvent {
         public Evasion(LivingEntity entity) {
             super(entity);
         }

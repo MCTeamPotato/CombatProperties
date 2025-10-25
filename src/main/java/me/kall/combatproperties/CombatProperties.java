@@ -2,13 +2,13 @@ package me.kall.combatproperties;
 
 import me.kall.combatproperties.config.CombatConfig;
 import me.kall.combatproperties.registry.ModAttributes;
-import me.kall.combatproperties.registry.ModPackets;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 @Mod(CombatProperties.MOD_ID)
 public final class CombatProperties {
@@ -16,9 +16,8 @@ public final class CombatProperties {
     public static final String MOD_NAME = "CombatProperties";
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 
-    public CombatProperties(@NotNull FMLJavaModLoadingContext context) {
-        ModAttributes.REGISTER.register(context.getModEventBus());
-        ModPackets.register();
-        context.registerConfig(ModConfig.Type.COMMON, CombatConfig.INSTANCE);
+    public CombatProperties(IEventBus modBus, Dist dist, ModContainer container) {
+        ModAttributes.REGISTER.register(modBus);
+        container.registerConfig(ModConfig.Type.COMMON, CombatConfig.INSTANCE);
     }
 }

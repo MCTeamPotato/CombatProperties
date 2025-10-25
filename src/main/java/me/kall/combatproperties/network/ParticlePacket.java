@@ -1,27 +1,24 @@
 package me.kall.combatproperties.network;
 
+import me.kall.combatproperties.CombatProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Supplier;
-
-public class ParticlePacket {
-    private final int entity;
-    private final byte particle;
-
-    public ParticlePacket(int entity, byte particle) {
-        this.entity = entity;
-        this.particle = particle;
-    }
+public record ParticlePacket(int entity, byte particle) implements CustomPacketPayload {
+    public static final StreamCodec<FriendlyByteBuf, ParticlePacket> CODEC = CustomPacketPayload.codec(ParticlePacket::toBytes, ParticlePacket::new);
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(CombatProperties.MOD_ID, "particle");
+    public static final Type<ParticlePacket> TYPE = new Type<>(ID);
 
     public ParticlePacket(@NotNull FriendlyByteBuf buf) {
-        this.entity = buf.readInt();
-        this.particle = buf.readByte();
+        this(buf.readInt(), buf.readByte());
     }
 
     public void toBytes(@NotNull FriendlyByteBuf buf) {
@@ -29,17 +26,21 @@ public class ParticlePacket {
         buf.writeByte(this.particle);
     }
 
-    public void handle(@NotNull Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
+    public static void handle(ParticlePacket packet, @NotNull IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
             Minecraft mc = Minecraft.getInstance();
             ClientLevel level = mc.level;
             if (level == null) return;
-            Entity target = level.getEntity(this.entity);
+            Entity target = level.getEntity(packet.entity);
             if (target == null) return;
-            ParticleOptions particle = ParticlesConstant.PARTICLES.get(this.particle);
+            ParticleOptions particle = ParticlesConstant.PARTICLES.get(packet.particle);
             if (particle == null) return;
             mc.particleEngine.createTrackingEmitter(target, particle);
         });
-        ctx.get().setPacketHandled(true);
+    }
+
+    @Override
+    public @NotNull Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }
