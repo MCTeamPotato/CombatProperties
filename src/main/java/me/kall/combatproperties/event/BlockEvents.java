@@ -34,7 +34,7 @@ public class BlockEvents {
         LivingEntity entity = event.getEntity();
         CompoundTag data = entity.getPersistentData();
 
-        if (CombatConfig.NOTIFICATION_CRIT.get() && !data.getBoolean("BlockNotification") && entity instanceof ServerPlayer player) {
+        if (CombatConfig.NOTIFICATION_BLOCK.get() && !data.getBoolean("BlockNotification") && entity instanceof ServerPlayer player) {
             player.displayClientMessage(Component.translatable("chat.combatproperties.block"), false);
             data.putBoolean("BlockNotification", true);
         }
