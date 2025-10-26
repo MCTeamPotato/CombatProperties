@@ -14,7 +14,7 @@ public class ParticlesConstant {
 
     static {
         PARTICLES.put(CRIT, ParticleTypes.CRIT);
-        PARTICLES.put(BLOCK, ParticleTypes.SONIC_BOOM);
+        PARTICLES.put(BLOCK, ParticleTypes.ELECTRIC_SPARK);
         PARTICLES.put(EVASION, ParticleTypes.CLOUD);
     }
 }
