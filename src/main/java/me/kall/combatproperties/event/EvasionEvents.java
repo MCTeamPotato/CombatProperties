@@ -38,7 +38,7 @@ public class EvasionEvents {
 
             event.setCanceled(true);
 
-            if (evasionEvent.isSoundAllowed()) level.playSound(null, attacked.getX(), attacked.getY(), attacked.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, attacked.getSoundSource(), 1.0F, 1.0F);
+            if (evasionEvent.isSoundAllowed()) level.playSound(null, attacked.getX(), attacked.getY(), attacked.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, attacked.getSoundSource(), 0.6F, 0.6F);
             if (evasionEvent.isParticleAllowed()) PacketDistributor.sendToPlayersTrackingEntity(attacked, new ParticlePacket(attacked.getId(), ParticlesConstant.EVASION));
         }
     }

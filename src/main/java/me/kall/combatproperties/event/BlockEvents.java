@@ -58,7 +58,7 @@ public class BlockEvents {
 
             event.setNewDamage(event.getNewDamage() * blockEvent.getDmgMultiply());
 
-            if (blockEvent.isSoundAllowed()) level.playSound(null, attacked.getX(), attacked.getY(), attacked.getZ(), SoundEvents.ANVIL_LAND, attacked.getSoundSource(), 1.0F, 1.0F);
+            if (blockEvent.isSoundAllowed()) level.playSound(null, attacked.getX(), attacked.getY(), attacked.getZ(), SoundEvents.ANVIL_LAND, attacked.getSoundSource(), 0.6F, 0.6F);
             if (blockEvent.isParticleAllowed()) PacketDistributor.sendToPlayersTrackingEntity(attacked, new ParticlePacket(attacked.getId(), ParticlesConstant.BLOCK));
         }
     }
